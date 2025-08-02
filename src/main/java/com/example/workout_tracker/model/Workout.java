@@ -2,6 +2,7 @@ package com.example.workout_tracker.model;
 
 import jakarta.persistence.*;
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 public class Workout {
@@ -36,4 +37,7 @@ public class Workout {
     public void setDate(LocalDate date) {
         this.date = date;
     }
+
+    @OneToMany(mappedBy ="workout", cascade = CascadeType.ALL)
+    private List<Exercise> exercises;
 }
