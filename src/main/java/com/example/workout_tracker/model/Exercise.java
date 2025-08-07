@@ -56,8 +56,6 @@ public class Exercise {
         this.workout = workout;
     }
 
-    public Exercise() {}
-
     public Exercise(String name, int reps, int sets, Workout workout){
         this.name = name;
         this.reps = reps;
