@@ -5,6 +5,7 @@ import com.example.workout_tracker.model.Exercise;
 import com.example.workout_tracker.model.Workout;
 import com.example.workout_tracker.repository.ExerciseRepository;
 import com.example.workout_tracker.repository.WorkoutRepository;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.http.HttpStatus;
@@ -26,33 +27,22 @@ public class ExerciseController {
     private ExerciseRepository exerciseRepository;
 
     @GetMapping
-    public List<Exercise> getAllExercises(){
-        return exerciseRepository.findAll();
-    }
-    @GetMapping
     public List<Exercise> getExercises(@RequestParam(required = false) Long workoutId){
         if(workoutId != null){
-            return exerciseRepository.findbyWorkoutId(workoutId);
+            return exerciseRepository.findByWorkoutId(workoutId);
         }
         else{
             return exerciseRepository.findAll();
         }
     }
 
-    @PostMapping
-    public ResponseEntity<Exercise> createExercise(@RequestBody Exercise exercise) {
-        Exercise saved = exerciseRepository.save(exercise);
-        return new ResponseEntity<>(saved, HttpStatus.CREATED);
-    }
-
     @PutMapping("/{id}")
-    public ResponseEntity<Exercise> updateExercise(@PathVariable Long id, @RequestBody Exercise updatedExercise) {
+    public ResponseEntity<Exercise> updateExercise(@PathVariable Long id,@Valid @RequestBody ExerciseRequest updatedRequest) {
         return exerciseRepository.findById(id)
                 .map(exercise -> {
-                    exercise.setName(updatedExercise.getName());
-                    exercise.setReps(updatedExercise.getSets());
-                    exercise.setSets(updatedExercise.getSets());
-                    exercise.setWorkout(updatedExercise.getWorkout()); // Optional
+                    exercise.setName(updatedRequest.getName());
+                    exercise.setReps(updatedRequest.getReps());
+                    exercise.setSets(updatedRequest.getSets());
                     Exercise saved = exerciseRepository.save(exercise);
                     return ResponseEntity.ok(saved);
                 })
@@ -69,7 +59,7 @@ public class ExerciseController {
     }
 
     @PostMapping
-    public ResponseEntity<Exercise> createExercise(@RequestBody ExerciseRequest request) {
+    public ResponseEntity<Exercise> createExercise(@Valid @RequestBody ExerciseRequest request) {
 
         Optional<Workout> workoutOptional = workoutRepository.findById(request.getWorkoutId()); // might contain a Workout, or might be empty
 
@@ -88,6 +78,12 @@ public class ExerciseController {
            return ResponseEntity.status(HttpStatus.CREATED).body(savedExercise);
 
 
+}
+    @GetMapping("/{id}")
+    public ResponseEntity<Exercise> getExerciseById(@PathVariable Long id){
+        Exercise exercise = exerciseRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND ,"Exercise not found"));
+        return ResponseEntity.ok(exercise);
 }
 
 }

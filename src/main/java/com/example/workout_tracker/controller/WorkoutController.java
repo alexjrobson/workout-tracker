@@ -1,10 +1,14 @@
 package com.example.workout_tracker.controller;
 
+import com.example.workout_tracker.dto.WorkoutRequest;
 import com.example.workout_tracker.model.Workout;
 import com.example.workout_tracker.repository.WorkoutRepository;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -14,25 +18,38 @@ import java.util.List;
 public class WorkoutController {
 
     @Autowired
-    private WorkoutRepository repo;
+    private WorkoutRepository workoutRepository;
 
     @GetMapping
     public List<Workout> getAllWorkouts(){
-        return repo.findAll();
+        return workoutRepository.findAll();
     }
 
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Workout> getWorkoutById(@PathVariable Long id){
+        Workout workout = workoutRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Workout not found"));
+        return ResponseEntity.ok(workout);
+    }
     @PostMapping
-    public Workout createWorkout(@RequestBody Workout workout){
-        return repo.save(workout);
+    public ResponseEntity<Workout> createWorkout(@Valid @RequestBody WorkoutRequest request){
+        Workout workout = new Workout();
+        workout.setName(request.getName());
+        workout.setDate(request.getDate());
+
+        Workout saved = workoutRepository.save(workout);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Workout> updateWorkout(@PathVariable Long id, @RequestBody Workout updatedWorkout){
-        return repo.findById(id)
+    public ResponseEntity<Workout> updateWorkout(@PathVariable Long id, @Valid @RequestBody WorkoutRequest updatedRequest){
+        return workoutRepository.findById(id)
                 .map(workout -> {
-                    workout.setName(updatedWorkout.getName());
-                    workout.setDate(updatedWorkout.getDate());
-                    Workout savedWorkout = repo.save(workout);
+                    workout.setName(updatedRequest.getName());
+                    workout.setDate(updatedRequest.getDate());
+                    Workout savedWorkout = workoutRepository.save(workout);
                     return ResponseEntity.ok(savedWorkout);
                 })
                 .orElse(ResponseEntity.notFound().build());
@@ -40,10 +57,10 @@ public class WorkoutController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteWorkout(@PathVariable Long id) {
-        if (!repo.existsById(id)) {
+        if (!workoutRepository.existsById(id)) {
             return ResponseEntity.notFound().build();
         }
-        repo.deleteById(id);
+        workoutRepository.deleteById(id);
         return ResponseEntity.noContent().build();
     }
 }

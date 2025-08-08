@@ -12,6 +12,7 @@ public class Workout {
     private Long id;
 
     private String name;
+
     private LocalDate date;
 
     public Long getId() {
