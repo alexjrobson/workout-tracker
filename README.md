@@ -3,7 +3,7 @@
 ## Workout Tracker API
 
 A Java Spring Boot REST API for tracking workouts, exercises, and progress over time.
-Built with **Java 23**, **Spring Boot**, and **PostgreSQL** — designed for scalability and future integration with a full-stack front end.
+Built with **Java 24**, **Spring Boot**, and **PostgreSQL** — designed for scalability and future integration with a full-stack front end.
 
 ---
 
