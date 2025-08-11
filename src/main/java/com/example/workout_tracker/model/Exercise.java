@@ -13,7 +13,7 @@ public class Exercise {
     private int sets;
 
     @ManyToOne
-    @JoinColumn(name ="workout_id")
+    @JoinColumn(name = "workout_id")
     private Workout workout;
 
     public Long getId() {
@@ -56,10 +56,18 @@ public class Exercise {
         this.workout = workout;
     }
 
-    public Exercise(String name, int reps, int sets, Workout workout){
+
+
+    public Exercise(){
+
+    }
+
+    public Exercise(String name, int reps, int sets, Workout workout) {
         this.name = name;
         this.reps = reps;
         this.sets = sets;
         this.workout = workout;
     }
 }
+
+

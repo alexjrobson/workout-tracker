@@ -39,6 +39,15 @@ public class Workout {
         this.date = date;
     }
 
-    @OneToMany(mappedBy ="workout", cascade = CascadeType.ALL)
+    public Workout() {
+
+    }
+    @OneToMany(mappedBy ="workout", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Exercise> exercises;
+
+    public List<Exercise> getExercises(){
+        return exercises;
+    }
+    public void setExercises(List<Exercise> exercises){ this.exercises = exercises;}
+
 }
