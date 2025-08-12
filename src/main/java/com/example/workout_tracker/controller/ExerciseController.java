@@ -1,6 +1,7 @@
 package com.example.workout_tracker.controller;
 
 import com.example.workout_tracker.dto.ExerciseRequest;
+import com.example.workout_tracker.dto.ExerciseResponse;
 import com.example.workout_tracker.model.Exercise;
 import com.example.workout_tracker.model.Workout;
 import com.example.workout_tracker.repository.ExerciseRepository;
@@ -15,6 +16,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @CrossOrigin(origins = "*")
 @RestController
@@ -27,26 +29,22 @@ public class ExerciseController {
     private ExerciseRepository exerciseRepository;
 
     @GetMapping
-    public List<Exercise> getExercises(@RequestParam(required = false) Long workoutId){
-        if(workoutId != null){
-            return exerciseRepository.findByWorkoutId(workoutId);
-        }
-        else{
-            return exerciseRepository.findAll();
-        }
+    public List<ExerciseResponse> getExercises(@RequestParam(required = false) Long workoutId){
+        List<Exercise> exercises = (workoutId != null)
+                ? exerciseRepository.findByWorkoutId(workoutId)
+                : exerciseRepository.findAll();
+
+        return exercises.stream()
+                .map(ex -> new ExerciseResponse(ex.getId(), ex.getName(), ex.getReps(), ex.getSets()))
+                .collect(Collectors.toList());
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Exercise> updateExercise(@PathVariable Long id,@Valid @RequestBody ExerciseRequest updatedRequest) {
-        return exerciseRepository.findById(id)
-                .map(exercise -> {
-                    exercise.setName(updatedRequest.getName());
-                    exercise.setReps(updatedRequest.getReps());
-                    exercise.setSets(updatedRequest.getSets());
-                    Exercise saved = exerciseRepository.save(exercise);
-                    return ResponseEntity.ok(saved);
-                })
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<ExerciseResponse> updateExercise(@PathVariable Long id,@Valid @RequestBody ExerciseRequest updatedRequest) {
+        Exercise exercise = exerciseRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Exercise not found"));
+        ExerciseResponse response = new ExerciseResponse(exercise.getId(), exercise.getName(), exercise.getReps(), exercise.getSets());
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{id}")
@@ -59,31 +57,30 @@ public class ExerciseController {
     }
 
     @PostMapping
-    public ResponseEntity<Exercise> createExercise(@Valid @RequestBody ExerciseRequest request) {
+    public ResponseEntity<ExerciseResponse> createExercise(@Valid @RequestBody ExerciseRequest request) {
 
-        Optional<Workout> workoutOptional = workoutRepository.findById(request.getWorkoutId()); // might contain a Workout, or might be empty
+        Workout workout = workoutRepository.findById(request.getWorkoutId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Workout not found"));
 
-        if (workoutOptional.isEmpty()){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Workout not found");
-        }
-            Workout workout = workoutOptional.get();
-            Exercise exercise = new Exercise(
-                    request.getName(),
-                    request.getReps(),
-                    request.getSets(),
-                    workout);
+        Exercise exercise = new Exercise(request.getName(), request.getReps(), request.getSets(), workout);
+        Exercise saved = exerciseRepository.save(exercise);
 
-           Exercise savedExercise = exerciseRepository.save(exercise);
+        ExerciseResponse response = new ExerciseResponse(saved.getId(), saved.getName(), saved.getReps(), saved.getSets());
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
 
-           return ResponseEntity.status(HttpStatus.CREATED).body(savedExercise);
-
-
-}
+    }
     @GetMapping("/{id}")
-    public ResponseEntity<Exercise> getExerciseById(@PathVariable Long id){
-        Exercise exercise = exerciseRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND ,"Exercise not found"));
-        return ResponseEntity.ok(exercise);
+    public ResponseEntity<ExerciseResponse> getExerciseById(@PathVariable Long id, @Valid @RequestBody ExerciseRequest updatedRequest){
+        return exerciseRepository.findById(id)
+                .map(exercise -> {
+                    exercise.setName(updatedRequest.getName());
+                    exercise.setReps(updatedRequest.getReps());
+                    exercise.setSets(updatedRequest.getSets());
+                    Exercise saved = exerciseRepository.save(exercise);
+                    ExerciseResponse response = new ExerciseResponse(saved.getId(), saved.getName(), saved.getReps(), saved.getSets());
+                    return ResponseEntity.ok(response);
+                })
+                .orElse(ResponseEntity.notFound().build());
 }
 
 }

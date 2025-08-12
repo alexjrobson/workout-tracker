@@ -1,20 +1,22 @@
-package com.example.workout_tracker.model;
+package com.example.workout_tracker.dto;
 
-import jakarta.persistence.*;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
-@Entity
-public class Workout {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class WorkoutResponse {
     private Long id;
-
     private String name;
-
     private LocalDate date;
+    private List<ExerciseResponse> exercises;
+
+
+    public WorkoutResponse(Long id, String name, LocalDate date, List<ExerciseResponse> exercises){
+        this.id = id;
+        this.name = name;
+        this.date = date;
+        this.exercises = exercises;
+
+    }
 
     public Long getId() {
         return id;
@@ -40,15 +42,11 @@ public class Workout {
         this.date = date;
     }
 
-    public Workout() {
-
-    }
-    @OneToMany(mappedBy ="workout", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Exercise> exercises = new ArrayList<>();
-
-    public List<Exercise> getExercises(){
+    public List<ExerciseResponse> getExercises() {
         return exercises;
     }
-    public void setExercises(List<Exercise> exercises){ this.exercises = exercises;}
 
+    public void setExercises(List<ExerciseResponse> exercises) {
+        this.exercises = exercises;
+    }
 }

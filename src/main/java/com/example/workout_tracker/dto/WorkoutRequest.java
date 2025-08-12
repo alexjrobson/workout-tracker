@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public class WorkoutRequest {
 
@@ -13,6 +14,16 @@ public class WorkoutRequest {
 
     @NotNull(message = "Date is required")
     private LocalDate date;
+
+    private List<ExerciseRequest> exercises;
+
+    public List<ExerciseRequest> getExercises() {
+        return exercises;
+    }
+
+    public void setExercises(List<ExerciseRequest> exercises) {
+        this.exercises = exercises;
+    }
 
     public String getName() {
         return name;
