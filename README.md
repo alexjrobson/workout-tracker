@@ -89,10 +89,25 @@ mvn spring-boot:run
 POST http://localhost:8080/api/workouts
 Content-Type: application/json
 
-{
-  "name": "Leg Day",
-  "description": "Squats, deadlifts, lunges"
-}
+ {
+        "id": 16,
+        "name": "Upper Body Day",
+        "date": "2025-08-12",
+        "exercises": [
+            {
+                "id": 16,
+                "name": "Bench Press",
+                "reps": 10,
+                "sets": 3
+            },
+            {
+                "id": 17,
+                "name": "Pull Ups",
+                "reps": 8,
+                "sets": 4
+            }
+        ]
+    }
 ```
 
 **Get All Workouts**
