@@ -72,21 +72,41 @@ public class WorkoutController {
     public ResponseEntity<WorkoutResponse> updateWorkout(@PathVariable Long id, @Valid @RequestBody WorkoutRequest updatedRequest){
         return workoutRepository.findById(id)
                 .map(workout -> {
+                    if(updatedRequest.getName() !=null){
                     workout.setName(updatedRequest.getName());
+                    }
+                    if(updatedRequest.getDate() !=null){
                     workout.setDate(updatedRequest.getDate());
+                    }
 
                     workout.getExercises().clear();
 
                     if(updatedRequest.getExercises() !=null){
                         for(ExerciseRequest exerciseRequest : updatedRequest.getExercises()) {
-                            Exercise exercise = new Exercise(
+                            if (exerciseRequest.getWorkoutId() != null){
+
+                                workout.getExercises().stream()
+                                        .filter(exercise -> exercise.getId().equals(exerciseRequest.getWorkoutId()))
+                                                .findFirst()
+                                        .ifPresent(exercise -> {
+                                            exercise.setName(exerciseRequest.getName());
+                                            exercise.setReps(exerciseRequest.getReps());
+                                            exercise.setSets(exerciseRequest.getSets());
+                                                });
+
+                            }
+
+                            else{
+                            Exercise exerciseNew = new Exercise(
                                     exerciseRequest.getName(),
                                     exerciseRequest.getSets(),
                                     exerciseRequest.getSets(),
-                                    workout);
-                            workout.getExercises().add(exercise);
+                                    workout
+                            );
+                            workout.getExercises().add(exerciseNew);
+                          }
                         }
-                    }
+                      }
                     Workout savedWorkout = workoutRepository.save(workout);
                     return ResponseEntity.ok(mapWorkoutToResponse(savedWorkout));
                 })
