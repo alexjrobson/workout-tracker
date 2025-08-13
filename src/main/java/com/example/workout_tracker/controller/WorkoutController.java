@@ -1,5 +1,6 @@
 package com.example.workout_tracker.controller;
 
+import com.example.workout_tracker.dto.ExerciseRequest;
 import com.example.workout_tracker.dto.ExerciseResponse;
 import com.example.workout_tracker.dto.WorkoutRequest;
 import com.example.workout_tracker.dto.WorkoutResponse;
@@ -73,6 +74,19 @@ public class WorkoutController {
                 .map(workout -> {
                     workout.setName(updatedRequest.getName());
                     workout.setDate(updatedRequest.getDate());
+
+                    workout.getExercises().clear();
+
+                    if(updatedRequest.getExercises() !=null){
+                        for(ExerciseRequest exerciseRequest : updatedRequest.getExercises()) {
+                            Exercise exercise = new Exercise(
+                                    exerciseRequest.getName(),
+                                    exerciseRequest.getSets(),
+                                    exerciseRequest.getSets(),
+                                    workout);
+                            workout.getExercises().add(exercise);
+                        }
+                    }
                     Workout savedWorkout = workoutRepository.save(workout);
                     return ResponseEntity.ok(mapWorkoutToResponse(savedWorkout));
                 })
