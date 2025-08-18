@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -79,7 +80,7 @@ public class WorkoutController {
                     workout.setDate(updatedRequest.getDate());
                     }
 
-                    workout.getExercises().clear();
+                    List<Exercise> updatedExercises = new ArrayList<>();
 
                     if(updatedRequest.getExercises() !=null){
                         for(ExerciseRequest exerciseRequest : updatedRequest.getExercises()) {
@@ -99,14 +100,18 @@ public class WorkoutController {
                             else{
                             Exercise exerciseNew = new Exercise(
                                     exerciseRequest.getName(),
-                                    exerciseRequest.getSets(),
+                                    exerciseRequest.getReps(),
                                     exerciseRequest.getSets(),
                                     workout
                             );
-                            workout.getExercises().add(exerciseNew);
+                            updatedExercises.add(exerciseNew);
                           }
                         }
                       }
+
+                    workout.getExercises().clear();
+                    workout.getExercises().addAll(updatedExercises);
+
                     Workout savedWorkout = workoutRepository.save(workout);
                     return ResponseEntity.ok(mapWorkoutToResponse(savedWorkout));
                 })

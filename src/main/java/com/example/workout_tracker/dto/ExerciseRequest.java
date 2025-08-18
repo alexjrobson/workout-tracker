@@ -10,6 +10,10 @@ public class ExerciseRequest {
     @Size(min =1, max =255, message = "Name must be between 1 and 255 characters")
     private String name;
 
+    @NotNull(message = "ID is required")
+    private Long id;
+
+
     @Min(value = 1, message = "Reps must be at least 1")
     private int reps;
 
@@ -26,6 +30,10 @@ public class ExerciseRequest {
     public void setName(String name) {
         this.name = name;
     }
+
+    public Long getId() {return id;}
+
+    public void setId(Long id) {this.id = id;}
 
     public int getReps() {
         return reps;
