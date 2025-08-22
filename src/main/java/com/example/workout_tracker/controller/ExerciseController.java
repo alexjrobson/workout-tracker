@@ -35,7 +35,7 @@ public class ExerciseController {
                 : exerciseRepository.findAll();
 
         return exercises.stream()
-                .map(ex -> new ExerciseResponse(ex.getId(), ex.getName(), ex.getReps(), ex.getSets()))
+                .map(ex -> new ExerciseResponse(ex.getId(), ex.getName(), ex.getReps(), ex.getSets(), ex.getWeight(), ex.isSetError()))
                 .collect(Collectors.toList());
     }
 
@@ -43,7 +43,7 @@ public class ExerciseController {
     public ResponseEntity<ExerciseResponse> updateExercise(@PathVariable Long id,@Valid @RequestBody ExerciseRequest updatedRequest) {
         Exercise exercise = exerciseRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Exercise not found"));
-        ExerciseResponse response = new ExerciseResponse(exercise.getId(), exercise.getName(), exercise.getReps(), exercise.getSets());
+        ExerciseResponse response = new ExerciseResponse(exercise.getId(), exercise.getName(), exercise.getReps(), exercise.getSets(),exercise.getWeight(), exercise.isSetError());
         return ResponseEntity.ok(response);
     }
 
@@ -62,10 +62,10 @@ public class ExerciseController {
         Workout workout = workoutRepository.findById(request.getWorkoutId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Workout not found"));
 
-        Exercise exercise = new Exercise(request.getName(), request.getReps(), request.getSets(), workout);
+        Exercise exercise = new Exercise(request.getName(), request.getReps(), request.getSets(), request.getWeight(), request.isSetError(), workout);
         Exercise saved = exerciseRepository.save(exercise);
 
-        ExerciseResponse response = new ExerciseResponse(saved.getId(), saved.getName(), saved.getReps(), saved.getSets());
+        ExerciseResponse response = new ExerciseResponse(saved.getId(), saved.getName(), saved.getReps(), saved.getSets(), saved.getWeight(), saved.isSetError());
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
 
     }
@@ -77,7 +77,7 @@ public class ExerciseController {
                     exercise.setReps(updatedRequest.getReps());
                     exercise.setSets(updatedRequest.getSets());
                     Exercise saved = exerciseRepository.save(exercise);
-                    ExerciseResponse response = new ExerciseResponse(saved.getId(), saved.getName(), saved.getReps(), saved.getSets());
+                    ExerciseResponse response = new ExerciseResponse(saved.getId(), saved.getName(), saved.getReps(), saved.getSets(), saved.getWeight(), saved.isSetError());
                     return ResponseEntity.ok(response);
                 })
                 .orElse(ResponseEntity.notFound().build());

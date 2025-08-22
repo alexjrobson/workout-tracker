@@ -57,6 +57,8 @@ public class WorkoutController {
                         ex.setName(exReq.getName());
                         ex.setReps(exReq.getReps());
                         ex.setSets(exReq.getSets());
+                        ex.setWeight(exReq.getWeight());
+                        ex.setSetError(exReq.isSetError());
                         ex.setWorkout(workout); // set the link back
                         return ex;
                     })
@@ -93,6 +95,8 @@ public class WorkoutController {
                                             exercise.setName(exerciseRequest.getName());
                                             exercise.setReps(exerciseRequest.getReps());
                                             exercise.setSets(exerciseRequest.getSets());
+                                            exercise.setWeight(exerciseRequest.getWeight());
+                                            exercise.setSetError(exerciseRequest.isSetError());
                                                 });
 
                             }
@@ -102,6 +106,8 @@ public class WorkoutController {
                                     exerciseRequest.getName(),
                                     exerciseRequest.getReps(),
                                     exerciseRequest.getSets(),
+                                    exerciseRequest.getWeight(),
+                                    exerciseRequest.isSetError(),
                                     workout
                             );
                             updatedExercises.add(exerciseNew);
@@ -131,7 +137,7 @@ public class WorkoutController {
         List<Exercise> exercises = workout.getExercises() == null ? Collections.emptyList() : workout.getExercises();
 
         List<ExerciseResponse> exerciseResponses = exercises.stream()
-                .map(ex -> new ExerciseResponse(ex.getId(), ex.getName(), ex.getReps(), ex.getSets()))
+                .map(ex -> new ExerciseResponse(ex.getId(), ex.getName(), ex.getReps(), ex.getSets(),ex.getWeight(), ex.isSetError()))
                 .collect(Collectors.toList());
 
         return new WorkoutResponse(workout.getId(), workout.getName(),workout.getDate(), exerciseResponses);

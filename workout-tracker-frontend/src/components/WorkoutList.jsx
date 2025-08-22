@@ -2,30 +2,57 @@ import React from "react";
 
 export default function WorkoutList({ workouts }) {
   return (
-    <div style={{ maxWidth: '500px', margin: 'auto', padding: '1rem', fontFamily: 'sans-serif' }}>
-      <h2 style={{ textAlign: 'center', marginBottom: '1rem' }}>Workouts</h2>
-      <ul style={{ listStyle: 'none', padding: 0 }}>
-        {workouts.map((w) => (
-          <li
-            key={w.id}
+    <div style={{ fontFamily: "sans-serif" }}>
+      {workouts.length === 0 ? (
+        <p style={{ textAlign: "center" }}>No workouts added yet.</p>
+      ) : (
+        workouts.map((workout) => (
+          <div
+            key={workout.id}
             style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              padding: '0.75rem 1rem',
-              marginBottom: '0.5rem',
-              borderRadius: '8px',
-              backgroundColor: '#f9f9f9',
-              boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
+              border: "1px solid #ddd",
+              borderRadius: "8px",
+              padding: "1rem",
+              marginBottom: "1rem",
+              boxShadow: "0 2px 5px rgba(0,0,0,0.05)",
             }}
           >
-            <span>{w.name}</span>
-            <span>
-              {w.weight ? `${w.weight} kg` : '-'} / {w.reps ? `${w.reps} reps` : '-'}
-            </span>
-          </li>
-        ))}
-      </ul>
+            <h3 style={{ margin: "0 0 0.5rem 0" }}>{workout.name}</h3>
+            <p style={{ fontSize: "0.85rem", color: "#666" }}>
+              Date: {new Date(workout.date).toLocaleDateString()}
+            </p>
+            {workout.exercises && workout.exercises.length > 0 ? (
+              <table style={{ width: "100%", borderCollapse: "collapse", marginTop: "0.5rem" }}>
+                <thead>
+                  <tr style={{ borderBottom: "1px solid #ccc" }}>
+                    <th style={{ textAlign: "left", padding: "0.25rem" }}>Exercise</th>
+                    <th style={{ textAlign: "center", padding: "0.25rem" }}>Sets</th>
+                    <th style={{ textAlign: "center", padding: "0.25rem" }}>Reps</th>
+                    <th style={{ textAlign: "center", padding: "0.25rem" }}>Weight (kg)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {workout.exercises.map((ex) => (
+                    <tr key={ex.id} style={{ borderBottom: "1px solid #eee" }}>
+                      <td style={{ padding: "0.25rem" }}>{ex.name}</td>
+                      <td style={{ textAlign: "center", padding: "0.25rem" }}>{ex.sets}</td>
+                      <td style={{ textAlign: "center", padding: "0.25rem" }}>{ex.reps}</td>
+                      <td style={{ textAlign: "center", padding: "0.25rem" }}>{ex.weight}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            ) : (
+              <p style={{ fontSize: "0.85rem", color: "#999", marginTop: "0.5rem" }}>
+                No exercises added yet.
+              </p>
+            )}
+          </div>
+        ))
+      )}
     </div>
   );
 }
+
+
 

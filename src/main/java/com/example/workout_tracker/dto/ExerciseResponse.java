@@ -5,12 +5,15 @@ public class ExerciseResponse {
     private String name;
     private int reps;
     private int sets;
+    private double weight;
+    private boolean setError;
 
-    public ExerciseResponse(Long id,String name, int reps, int sets){
+    public ExerciseResponse(Long id,String name, int reps, int sets, double weight, boolean setError){
         this.id = id;
         this.name = name;
         this.reps = reps;
         this.sets = sets;
+        this.weight = weight;
     }
 
     public Long getId() {
@@ -44,4 +47,17 @@ public class ExerciseResponse {
     public void setSets(int sets) {
         this.sets = sets;
     }
+
+    public double getWeight() {return weight;}
+
+    public void setWeight(double weight) {this.weight = weight;}
+
+    public boolean isSetError() {
+        return setError;
+    }
+
+    public void setSetError(boolean setError) {
+        this.setError = setError;
+    }
 }
+

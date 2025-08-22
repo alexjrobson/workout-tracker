@@ -6,7 +6,7 @@ import { getWorkouts } from "./api/workouts";
 function App() {
   const [workouts, setWorkouts] = useState([]);
 
-  //Fetches workouts from backend
+  // Fetch workouts from backend on component mount
   useEffect(() => {
     const fetchWorkouts = async () => {
       const data = await getWorkouts();
@@ -18,7 +18,7 @@ function App() {
   return (
     <div style={{ fontFamily: "sans-serif", maxWidth: "600px", margin: "auto", padding: "2rem" }}>
       <h1 style={{ textAlign: "center", marginBottom: "2rem" }}>Workout Tracker</h1>
-      
+
       {/* Workout Form */}
       <WorkoutForm workouts={workouts} setWorkouts={setWorkouts} />
 
@@ -29,4 +29,5 @@ function App() {
 }
 
 export default App;
+
 

@@ -11,6 +11,9 @@ public class Exercise {
     private String name;
     private int reps;
     private int sets;
+    private double weight;
+    private boolean setError;
+
 
     @ManyToOne
     @JoinColumn(name = "workout_id")
@@ -56,16 +59,33 @@ public class Exercise {
         this.workout = workout;
     }
 
+    public double getWeight() {
+        return weight;
+    }
+
+    public void setWeight(double weight) {
+        this.weight = weight;
+    }
+
+    public boolean isSetError() {
+        return setError;
+    }
+
+    public void setSetError(boolean setError) {
+        this.setError = setError;
+    }
 
 
     public Exercise(){
 
     }
 
-    public Exercise(String name, int reps, int sets, Workout workout) {
+    public Exercise(String name, int reps, int sets,double weight, boolean setError, Workout workout) {
         this.name = name;
         this.reps = reps;
         this.sets = sets;
+        this.weight = weight;
+        this.setError = setError;
         this.workout = workout;
     }
 }
