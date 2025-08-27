@@ -31,8 +31,8 @@ public class WorkoutRepositoryTest {
         workout.setName("Chest Day");
         workout.setDate(LocalDate.now());
 
-        Exercise ex1 = new Exercise("Bench Press", 10, 3, workout);
-        Exercise ex2 = new Exercise("Incline Dumbbell Press", 12, 3, workout);
+        Exercise ex1 = new Exercise("Bench Press", 10, 3, 100, false, workout);
+        Exercise ex2 = new Exercise("Incline Dumbbell Press", 12, 3, 80, true,workout);
 
         workout.setExercises(List.of(ex1, ex2));
 

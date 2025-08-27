@@ -13,8 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.time.LocalDate;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
@@ -33,7 +32,7 @@ public class ExerciseRepositoryTest {
         workout.setDate(LocalDate.now());
         workoutRepository.save(workout);
 
-        Exercise exercise = new Exercise("Bench Press", 10, 3, workout);
+        Exercise exercise = new Exercise("Bench Press", 10, 3,100, true, workout);
         exerciseRepository.save(exercise);
 
         List<Exercise> exercises = exerciseRepository.findAll();
@@ -41,6 +40,9 @@ public class ExerciseRepositoryTest {
         assertEquals("Bench Press", exercises.get(0).getName());
         assertEquals(10, exercises.get(0).getReps());
         assertEquals(3, exercises.get(0).getSets());
+        assertEquals(100, exercises.get(0).getWeight());
+        assertTrue(exercises.get(0).isSetError());
+
 
         assertNotNull(exercises.get(0).getWorkout());
         assertEquals(workout.getId(), exercises.get(0).getWorkout().getId());
