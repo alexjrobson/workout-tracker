@@ -1,5 +1,7 @@
 package com.example.workout_tracker.dto;
 
+//DTO used to send exercise data to the frontend. Mirrors Exercise entity but is decoupled from the database model
+
 public class ExerciseResponse {
     private Long id;
     private String name;

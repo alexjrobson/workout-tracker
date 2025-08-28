@@ -18,6 +18,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+//REST controller for managing exercises. Handles creation, retrieval, update, and deletion of individual exercises.
+
 @CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/api/exercises")

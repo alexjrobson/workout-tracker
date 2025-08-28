@@ -5,6 +5,8 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+//Represents a complete workout session, stores the date, name, and all the Exercise.java performed during the session
+
 @Entity
 public class Workout {
 
@@ -43,6 +45,8 @@ public class Workout {
     public Workout() {
 
     }
+
+    //One workout can contain multiple exercises.
     @OneToMany(mappedBy ="workout", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Exercise> exercises = new ArrayList<>();
 

@@ -4,6 +4,8 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
+//DTO used when creating or updating an exercise. Sent from frontend to backend API
+
 public class ExerciseRequest {
 
     @NotNull(message = "Name is required")

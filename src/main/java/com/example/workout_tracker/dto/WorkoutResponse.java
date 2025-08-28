@@ -3,6 +3,8 @@ package com.example.workout_tracker.dto;
 import java.time.LocalDate;
 import java.util.List;
 
+//DTO for sending workout data to the frontend. Contains nested exercises.
+
 public class WorkoutResponse {
     private Long id;
     private String name;

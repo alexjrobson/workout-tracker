@@ -6,6 +6,8 @@ import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
 import java.util.List;
 
+//DTO for creating or updating a workout. Includes workout metadata and a list of exercises
+
 public class WorkoutRequest {
 
     @NotNull(message ="Name is required")
