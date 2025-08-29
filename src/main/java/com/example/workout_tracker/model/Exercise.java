@@ -12,10 +12,10 @@ public class Exercise {
     private Long id;
 
     private String name;
-    private int reps;
-    private int sets;
-    private double weight;
-    private boolean setError;
+    private Integer reps;
+    private Integer sets;
+    private Double weight;
+    private Boolean setError;
 
 
     //Each exercise belongs to a single workout
@@ -39,19 +39,19 @@ public class Exercise {
         this.name = name;
     }
 
-    public int getReps() {
+    public Integer getReps() {
         return reps;
     }
 
-    public void setReps(int reps) {
+    public void setReps(Integer reps) {
         this.reps = reps;
     }
 
-    public int getSets() {
+    public Integer getSets() {
         return sets;
     }
 
-    public void setSets(int sets) {
+    public void setSets(Integer sets) {
         this.sets = sets;
     }
 
@@ -63,19 +63,19 @@ public class Exercise {
         this.workout = workout;
     }
 
-    public double getWeight() {
+    public Double getWeight() {
         return weight;
     }
 
-    public void setWeight(double weight) {
+    public void setWeight(Double weight) {
         this.weight = weight;
     }
 
-    public boolean isSetError() {
+    public Boolean isSetError() {
         return setError;
     }
 
-    public void setSetError(boolean setError) {
+    public void setSetError(Boolean setError) {
         this.setError = setError;
     }
 
@@ -84,7 +84,7 @@ public class Exercise {
 
     }
 
-    public Exercise(String name, int reps, int sets,double weight, boolean setError, Workout workout) {
+    public Exercise(String name, Integer reps, Integer sets, Double weight, Boolean setError, Workout workout) {
         this.name = name;
         this.reps = reps;
         this.sets = sets;

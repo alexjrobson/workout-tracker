@@ -32,7 +32,7 @@ public class ExerciseRepositoryTest {
         workout.setDate(LocalDate.now());
         workoutRepository.save(workout);
 
-        Exercise exercise = new Exercise("Bench Press", 10, 3,100, true, workout);
+        Exercise exercise = new Exercise("Bench Press", 10, 3, 100.0, true, workout);
         exerciseRepository.save(exercise);
 
         List<Exercise> exercises = exerciseRepository.findAll();

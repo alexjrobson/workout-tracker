@@ -15,15 +15,15 @@ public class ExerciseRequest {
     @NotNull(message = "ID is required")
     private Long id;
 
-    private double weight;
+    private Double weight;
 
-    private boolean setError;
+    private Boolean setError;
 
     @Min(value = 1, message = "Reps must be at least 1")
-    private int reps;
+    private Integer reps;
 
     @Min(value = 1, message = "Sets must be at least 1")
-    private int sets;
+    private Integer sets;
 
     @NotNull(message = "Workout ID is required")
     private Long workoutId;
@@ -40,15 +40,15 @@ public class ExerciseRequest {
 
     public void setId(Long id) {this.id = id;}
 
-    public double getWeight() {return weight;}
+    public Double getWeight() {return weight;}
 
-    public void setWeight(double weight) {this.weight = weight;}
+    public void setWeight(Double weight) {this.weight = weight;}
 
     public int getReps() {
         return reps;
     }
 
-    public void setReps(int reps) {
+    public void setReps(Integer reps) {
         this.reps = reps;
     }
 
@@ -56,7 +56,7 @@ public class ExerciseRequest {
         return sets;
     }
 
-    public void setSets(int sets) {
+    public void setSets(Integer sets) {
         this.sets = sets;
     }
 
@@ -68,11 +68,11 @@ public class ExerciseRequest {
         this.workoutId = workoutId;
     }
 
-    public boolean isSetError() {
+    public Boolean isSetError() {
         return setError;
     }
 
-    public void setSetError(boolean setError) {
+    public void setSetError(Boolean setError) {
         this.setError = setError;
     }
 }

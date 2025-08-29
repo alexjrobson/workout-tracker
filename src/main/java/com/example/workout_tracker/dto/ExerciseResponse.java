@@ -5,12 +5,12 @@ package com.example.workout_tracker.dto;
 public class ExerciseResponse {
     private Long id;
     private String name;
-    private int reps;
-    private int sets;
-    private double weight;
-    private boolean setError;
+    private Integer reps;
+    private Integer sets;
+    private Double weight;
+    private Boolean setError;
 
-    public ExerciseResponse(Long id,String name, int reps, int sets, double weight, boolean setError){
+    public ExerciseResponse(Long id,String name, Integer reps, Integer sets, Double weight, Boolean setError){
         this.id = id;
         this.name = name;
         this.reps = reps;
@@ -34,31 +34,31 @@ public class ExerciseResponse {
         this.name = name;
     }
 
-    public int getReps() {
+    public Integer getReps() {
         return reps;
     }
 
-    public void setReps(int reps) {
+    public void setReps(Integer reps) {
         this.reps = reps;
     }
 
-    public int getSets() {
+    public Integer getSets() {
         return sets;
     }
 
-    public void setSets(int sets) {
+    public void setSets(Integer sets) {
         this.sets = sets;
     }
 
-    public double getWeight() {return weight;}
+    public Double getWeight() {return weight;}
 
-    public void setWeight(double weight) {this.weight = weight;}
+    public void setWeight(Double weight) {this.weight = weight;}
 
-    public boolean isSetError() {
+    public Boolean isSetError() {
         return setError;
     }
 
-    public void setSetError(boolean setError) {
+    public void setSetError(Boolean setError) {
         this.setError = setError;
     }
 }

@@ -23,7 +23,7 @@ import static java.util.Arrays.stream;
 
 //REST controller for managin workouts. Handles CRUD operations for workouts and delegates nested exercises to the ExerciseController or service layer.
 
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/api/workouts")
 public class WorkoutController {

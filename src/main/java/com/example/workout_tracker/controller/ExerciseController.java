@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 
 //REST controller for managing exercises. Handles creation, retrieval, update, and deletion of individual exercises.
 
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/api/exercises")
 public class ExerciseController {
