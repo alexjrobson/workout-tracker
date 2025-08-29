@@ -77,6 +77,7 @@ public class WorkoutController {
     public ResponseEntity<WorkoutResponse> updateWorkout(@PathVariable Long id, @Valid @RequestBody WorkoutRequest updatedRequest){
         return workoutRepository.findById(id)
                 .map(workout -> {
+                    //Update basic fields
                     if(updatedRequest.getName() !=null){
                     workout.setName(updatedRequest.getName());
                     }
@@ -84,26 +85,32 @@ public class WorkoutController {
                     workout.setDate(updatedRequest.getDate());
                     }
 
+                    // Handle exercises
                     List<Exercise> updatedExercises = new ArrayList<>();
 
                     if(updatedRequest.getExercises() !=null){
                         for(ExerciseRequest exerciseRequest : updatedRequest.getExercises()) {
-                            if (exerciseRequest.getWorkoutId() != null){
+                            if (exerciseRequest.getId() != null){
 
+                                // Update existing exercise
                                 workout.getExercises().stream()
-                                        .filter(exercise -> exercise.getId().equals(exerciseRequest.getWorkoutId()))
+                                        .filter(exercise -> exercise.getId().equals(exerciseRequest.getId()))
                                                 .findFirst()
                                         .ifPresent(exercise -> {
+                                            exercise.setId(exerciseRequest.getId());
                                             exercise.setName(exerciseRequest.getName());
                                             exercise.setReps(exerciseRequest.getReps());
                                             exercise.setSets(exerciseRequest.getSets());
                                             exercise.setWeight(exerciseRequest.getWeight());
                                             exercise.setSetError(exerciseRequest.isSetError());
+                                            exercise.setWorkout(workout);
+
                                                 });
 
                             }
 
                             else{
+                                //add a new exercise
                             Exercise exerciseNew = new Exercise(
                                     exerciseRequest.getName(),
                                     exerciseRequest.getReps(),
@@ -112,13 +119,10 @@ public class WorkoutController {
                                     exerciseRequest.isSetError(),
                                     workout
                             );
-                            updatedExercises.add(exerciseNew);
+                            workout.getExercises().add(exerciseNew);
                           }
                         }
                       }
-
-                    workout.getExercises().clear();
-                    workout.getExercises().addAll(updatedExercises);
 
                     Workout savedWorkout = workoutRepository.save(workout);
                     return ResponseEntity.ok(mapWorkoutToResponse(savedWorkout));

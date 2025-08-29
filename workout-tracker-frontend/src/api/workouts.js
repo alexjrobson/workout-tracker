@@ -16,13 +16,25 @@ export const getWorkouts = async () => {
 };
 
 export async function updateWorkout(id, workout) {
-  const res = await fetch(`${API_URL}/${id}`, {
+  const response = await fetch(`${API_URL}/${id}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(workout),
   });
-  return res.json();
+  if (!response.ok){
+    throw new Error("Failed to update workout");
+  }
+  return await response.json();
 }
+
+export async function deleteWorkout(id) {
+  const response = await fetch(`${API_URL}/${id}`, { method: "DELETE" });
+  if (!response.ok) {
+    throw new Error("Failed to delete workout");
+  }
+  return true;
+}
+
 
 /**
  * Add a new workout to backend

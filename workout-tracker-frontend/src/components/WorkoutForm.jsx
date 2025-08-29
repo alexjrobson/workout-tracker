@@ -1,11 +1,30 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { addWorkout, updateWorkout } from "../api/workouts";
 
 function WorkoutForm({ workouts, setWorkouts }) {
+  const [editingWorkoutId, setEditingWorkoutId] = useState(null);
   const [name, setName] = useState("");
-  const [exercises, setExercises] = useState([
-    { name: "", reps: 0, sets: 0, weight: 0, setError: false },
-  ]);
+  const [exercises, setExercises] = useState([]);
+
+  // Load workout into form for editing
+  const loadWorkout = (workout) => {
+    setEditingWorkoutId(workout.id);
+    setName(workout.name);
+    setExercises(workout.exercises.map(ex => ({
+      id: ex.id,
+      name: ex.name,
+      reps: ex.reps,
+      sets: ex.sets,
+      weight: ex.weight,
+      setError: ex.setError
+    })));
+  };
+
+  const resetForm = () => {
+    setEditingWorkoutId(null);
+    setName("");
+    setExercises([{ name: "", reps: 0, sets: 0, weight: 0, setError: false }]);
+  };
 
   const handleExerciseChange = (index, field, value) => {
     const updated = [...exercises];
@@ -18,46 +37,49 @@ function WorkoutForm({ workouts, setWorkouts }) {
     setExercises([...exercises, { name: "", reps: 0, sets: 0, weight: 0, setError: false }]);
   };
 
-  const handleAddWorkout = async (e) => {
+  const removeExerciseField = (index) => {
+    setExercises(exercises.filter((_, i) => i !== index));
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!name.trim()) return;
 
-    const newWorkout = { 
+    const workoutData = {
       name,
-      date: new Date().toISOString().split("T")[0], // today
+      date: new Date().toISOString().split("T")[0],
       exercises
     };
 
-    const created = await addWorkout(newWorkout);
-    if (created) setWorkouts([...workouts, created]);
-    setName("");
-    setExercises([{ name: "", reps: 0, sets: 0, weight: 0, setError: false }]);
-  };
-
-  const handleUpdateWorkout = async (workoutId) => {
-    const workoutToUpdate = workouts.find((w) => w.id === workoutId);
-    if (!workoutToUpdate) return;
-
-    const updatedWorkout = {
-      ...workoutToUpdate,
-      exercises: workoutToUpdate.exercises,
-    };
-
-    const saved = await updateWorkout(workoutId, updatedWorkout);
-    if (saved) {
-      setWorkouts(workouts.map(w => (w.id === workoutId ? saved : w)));
+    if (editingWorkoutId) {
+      // Update existing workout
+      try {
+        const saved = await updateWorkout(editingWorkoutId, workoutData);
+        if (saved) {
+          setWorkouts(workouts.map(w => (w.id === editingWorkoutId ? saved : w)));
+        }
+        resetForm();
+      } catch (err) {
+        console.error("Failed to update workout:", err);
+      }
+    } else {
+      // Add new workout
+      const created = await addWorkout(workoutData);
+      if (created) setWorkouts([...workouts, created]);
+      resetForm();
     }
   };
 
   return (
     <div style={{ maxWidth: "600px", margin: "auto", padding: "1rem", fontFamily: "sans-serif" }}>
-      <form onSubmit={handleAddWorkout} style={{ marginBottom: "2rem" }}>
+      <form onSubmit={handleSubmit} style={{ marginBottom: "2rem" }}>
         <input
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="Workout name"
           style={{ width: "100%", padding: "0.5rem", marginBottom: "1rem", borderRadius: "6px", border: "1px solid #ccc" }}
         />
+
         {exercises.map((ex, i) => (
           <div key={i} style={{ display: "flex", gap: "0.5rem", marginBottom: "0.5rem" }}>
             <input
@@ -95,13 +117,18 @@ function WorkoutForm({ workouts, setWorkouts }) {
               <option value={false}>✅ Completed</option>
               <option value={true}>❌ Failed</option>
             </select>
+            <button type="button" onClick={() => removeExerciseField(i)} style={{ flex: 0.5 }}>
+              ❌
+            </button>
           </div>
         ))}
+
         <button type="button" onClick={addExerciseField} style={{ marginBottom: "1rem" }}>
           + Add Exercise
         </button>
-        <button type="submit" style={{ display: "block", padding: "0.5rem 1rem", borderRadius: "6px", backgroundColor: "#4CAF50", color: "white", border: "none", cursor: "pointer" }}>
-          Add Workout
+
+        <button type="submit" style={{ display: "block", padding: "0.5rem 1rem", borderRadius: "6px", backgroundColor: editingWorkoutId ? "#2196F3" : "#4CAF50", color: "white", border: "none", cursor: "pointer" }}>
+          {editingWorkoutId ? "Update Workout" : "Add Workout"}
         </button>
       </form>
 
@@ -116,8 +143,8 @@ function WorkoutForm({ workouts, setWorkouts }) {
                 </li>
               ))}
             </ul>
-            <button onClick={() => handleUpdateWorkout(w.id)} style={{ padding: "0.3rem 0.6rem", borderRadius: "6px", backgroundColor: "#2196F3", color: "white", border: "none", cursor: "pointer" }}>
-              Update
+            <button onClick={() => loadWorkout(w)} style={{ padding: "0.3rem 0.6rem", borderRadius: "6px", backgroundColor: "#FFA500", color: "white", border: "none", cursor: "pointer" }}>
+              Edit
             </button>
           </div>
         ))}
@@ -127,4 +154,3 @@ function WorkoutForm({ workouts, setWorkouts }) {
 }
 
 export default WorkoutForm;
-
