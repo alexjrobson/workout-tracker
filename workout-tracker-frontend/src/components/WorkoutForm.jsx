@@ -27,19 +27,25 @@ function WorkoutForm({ workouts, setWorkouts }) {
   };
 
   const handleExerciseChange = (index, field, value) => {
-    const updated = [...exercises];
-    if (field === "setError") value = value === "true"; // convert string to boolean
-    updated[index][field] = value;
-    setExercises(updated);
-  };
+  setExercises(prev => {
+    const updated = [...prev];
+    updated[index] = {
+      ...updated[index], // ✅ preserve id and other fields
+      [field]: field === "setError" ? value === "true" : value
+    };
+    return updated;
+  });
+};
+
 
   const addExerciseField = () => {
     setExercises([...exercises, { name: "", reps: 0, sets: 0, weight: 0, setError: false }]);
   };
 
   const removeExerciseField = (index) => {
-    setExercises(exercises.filter((_, i) => i !== index));
-  };
+  setExercises(prev => prev.filter((_, i) => i !== index));
+};
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();

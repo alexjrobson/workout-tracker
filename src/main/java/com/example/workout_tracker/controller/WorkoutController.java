@@ -74,61 +74,38 @@ public class WorkoutController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<WorkoutResponse> updateWorkout(@PathVariable Long id, @Valid @RequestBody WorkoutRequest updatedRequest){
-        return workoutRepository.findById(id)
-                .map(workout -> {
-                    //Update basic fields
-                    if(updatedRequest.getName() !=null){
-                    workout.setName(updatedRequest.getName());
-                    }
-                    if(updatedRequest.getDate() !=null){
-                    workout.setDate(updatedRequest.getDate());
-                    }
+    public ResponseEntity<WorkoutResponse> updateWorkout(
+            @PathVariable Long id,
+            @Valid @RequestBody WorkoutRequest request) {
 
-                    // Handle exercises
-                    List<Exercise> updatedExercises = new ArrayList<>();
+        Workout workout = workoutRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Workout not found"));
 
-                    if(updatedRequest.getExercises() !=null){
-                        for(ExerciseRequest exerciseRequest : updatedRequest.getExercises()) {
-                            if (exerciseRequest.getId() != null){
+        // Update fields if provided
+        if (request.getName() != null) workout.setName(request.getName());
+        if (request.getDate() != null) workout.setDate(request.getDate());
 
-                                // Update existing exercise
-                                workout.getExercises().stream()
-                                        .filter(exercise -> exercise.getId().equals(exerciseRequest.getId()))
-                                                .findFirst()
-                                        .ifPresent(exercise -> {
-                                            exercise.setId(exerciseRequest.getId());
-                                            exercise.setName(exerciseRequest.getName());
-                                            exercise.setReps(exerciseRequest.getReps());
-                                            exercise.setSets(exerciseRequest.getSets());
-                                            exercise.setWeight(exerciseRequest.getWeight());
-                                            exercise.setSetError(exerciseRequest.isSetError());
-                                            exercise.setWorkout(workout);
+        // Clear & rebuild exercises (orphanRemoval=true will delete removed ones)
+        workout.getExercises().clear();
+        if (request.getExercises() != null) {
+            for (ExerciseRequest exReq : request.getExercises()) {
+                Exercise ex = new Exercise(
+                        exReq.getName(),
+                        exReq.getReps(),
+                        exReq.getSets(),
+                        exReq.getWeight(),
+                        exReq.isSetError(),
+                        workout
+                );
+                workout.addExercise(ex); // keeps both sides in sync
+            }
+        }
 
-                                                });
-
-                            }
-
-                            else{
-                                //add a new exercise
-                            Exercise exerciseNew = new Exercise(
-                                    exerciseRequest.getName(),
-                                    exerciseRequest.getReps(),
-                                    exerciseRequest.getSets(),
-                                    exerciseRequest.getWeight(),
-                                    exerciseRequest.isSetError(),
-                                    workout
-                            );
-                            workout.getExercises().add(exerciseNew);
-                          }
-                        }
-                      }
-
-                    Workout savedWorkout = workoutRepository.save(workout);
-                    return ResponseEntity.ok(mapWorkoutToResponse(savedWorkout));
-                })
-                .orElse(ResponseEntity.notFound().build());
+        Workout saved = workoutRepository.save(workout);
+        return ResponseEntity.ok(mapWorkoutToResponse(saved));
     }
+
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteWorkout(@PathVariable Long id) {

@@ -55,4 +55,14 @@ public class Workout {
     }
     public void setExercises(List<Exercise> exercises){ this.exercises = exercises;}
 
+    public void addExercise (Exercise exercise){
+        exercises.add(exercise);
+        exercise.setWorkout(this);
+    }
+
+    public void removeExercise(Exercise exercise){
+        exercises.remove(exercise);
+        exercise.setWorkout(null);
+    }
+
 }

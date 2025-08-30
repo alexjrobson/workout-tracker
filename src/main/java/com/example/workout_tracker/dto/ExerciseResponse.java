@@ -16,6 +16,7 @@ public class ExerciseResponse {
         this.reps = reps;
         this.sets = sets;
         this.weight = weight;
+        this.setError = setError;
     }
 
     public Long getId() {
