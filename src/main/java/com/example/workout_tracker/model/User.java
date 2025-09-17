@@ -24,6 +24,7 @@ public class User {
     @CollectionTable(name ="user_roles", joinColumns = @JoinColumn(name = "user_id"))
     private Set<String> roles = new HashSet<>();
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private Set<Workout> workouts = new HashSet<>();
 
     public Set<Workout> getWorkouts(){

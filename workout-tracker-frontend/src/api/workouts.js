@@ -1,12 +1,20 @@
 const API_URL = "http://localhost:8080/api/workouts";
 
+// Helper: get auth headers
+function authHeader() {
+  const token = localStorage.getItem("token");
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
 /**
  * Fetch all workouts from backend
  * @returns Array of workouts or empty array on error
  */
 export const getWorkouts = async () => {
   try {
-    const response = await fetch(API_URL);
+    const response = await fetch(API_URL, {
+      headers: { ...authHeader() },
+    });
     if (!response.ok) throw new Error("Failed to fetch workouts");
     return await response.json();
   } catch (error) {
@@ -18,23 +26,25 @@ export const getWorkouts = async () => {
 export async function updateWorkout(id, workout) {
   const response = await fetch(`${API_URL}/${id}`, {
     method: "PUT",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...authHeader() },
     body: JSON.stringify(workout),
   });
-  if (!response.ok){
+  if (!response.ok) {
     throw new Error("Failed to update workout");
   }
   return await response.json();
 }
 
 export async function deleteWorkout(id) {
-  const response = await fetch(`${API_URL}/${id}`, { method: "DELETE" });
+  const response = await fetch(`${API_URL}/${id}`, {
+    method: "DELETE",
+    headers: { ...authHeader() },
+  });
   if (!response.ok) {
     throw new Error("Failed to delete workout");
   }
   return true;
 }
-
 
 /**
  * Add a new workout to backend
@@ -45,7 +55,7 @@ export const addWorkout = async (workout) => {
   try {
     const response = await fetch(API_URL, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...authHeader() },
       body: JSON.stringify(workout),
     });
 
@@ -54,13 +64,10 @@ export const addWorkout = async (workout) => {
       throw new Error(`Failed to add workout: ${errMsg}`);
     }
 
-    const createdWorkout = await response.json();
-    return createdWorkout;
+    return await response.json();
   } catch (error) {
     console.error("Error adding workout:", error);
     return null;
   }
-
-
 };
 

@@ -1,24 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useContext } from "react";
 import { addWorkout, updateWorkout } from "../api/workouts";
+import { AuthContext } from "../context/AuthContext";
 
-function WorkoutForm({ workouts, setWorkouts }) {
+function WorkoutForm({ onWorkoutSaved }) {
+  const { token } = useContext(AuthContext); // ✅ use auth token
   const [editingWorkoutId, setEditingWorkoutId] = useState(null);
   const [name, setName] = useState("");
-  const [exercises, setExercises] = useState([]);
-
-  // Load workout into form for editing
-  const loadWorkout = (workout) => {
-    setEditingWorkoutId(workout.id);
-    setName(workout.name);
-    setExercises(workout.exercises.map(ex => ({
-      id: ex.id,
-      name: ex.name,
-      reps: ex.reps,
-      sets: ex.sets,
-      weight: ex.weight,
-      setError: ex.setError
-    })));
-  };
+  const [exercises, setExercises] = useState([
+    { name: "", reps: 0, sets: 0, weight: 0, setError: false }
+  ]);
 
   const resetForm = () => {
     setEditingWorkoutId(null);
@@ -27,25 +17,23 @@ function WorkoutForm({ workouts, setWorkouts }) {
   };
 
   const handleExerciseChange = (index, field, value) => {
-  setExercises(prev => {
-    const updated = [...prev];
-    updated[index] = {
-      ...updated[index], // ✅ preserve id and other fields
-      [field]: field === "setError" ? value === "true" : value
-    };
-    return updated;
-  });
-};
-
+    setExercises((prev) => {
+      const updated = [...prev];
+      updated[index] = {
+        ...updated[index],
+        [field]: field === "setError" ? value === "true" : value,
+      };
+      return updated;
+    });
+  };
 
   const addExerciseField = () => {
     setExercises([...exercises, { name: "", reps: 0, sets: 0, weight: 0, setError: false }]);
   };
 
   const removeExerciseField = (index) => {
-  setExercises(prev => prev.filter((_, i) => i !== index));
-};
-
+    setExercises((prev) => prev.filter((_, i) => i !== index));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -54,25 +42,23 @@ function WorkoutForm({ workouts, setWorkouts }) {
     const workoutData = {
       name,
       date: new Date().toISOString().split("T")[0],
-      exercises
+      exercises,
     };
 
-    if (editingWorkoutId) {
-      // Update existing workout
-      try {
-        const saved = await updateWorkout(editingWorkoutId, workoutData);
-        if (saved) {
-          setWorkouts(workouts.map(w => (w.id === editingWorkoutId ? saved : w)));
-        }
-        resetForm();
-      } catch (err) {
-        console.error("Failed to update workout:", err);
+    try {
+      let saved;
+      if (editingWorkoutId) {
+        saved = await updateWorkout(editingWorkoutId, workoutData, token);
+      } else {
+        saved = await addWorkout(workoutData, token);
       }
-    } else {
-      // Add new workout
-      const created = await addWorkout(workoutData);
-      if (created) setWorkouts([...workouts, created]);
-      resetForm();
+
+      if (saved) {
+        onWorkoutSaved(saved); // ✅ parent (WorkoutList) updates state
+        resetForm();
+      }
+    } catch (err) {
+      console.error("Failed to save workout:", err);
     }
   };
 
@@ -133,28 +119,21 @@ function WorkoutForm({ workouts, setWorkouts }) {
           + Add Exercise
         </button>
 
-        <button type="submit" style={{ display: "block", padding: "0.5rem 1rem", borderRadius: "6px", backgroundColor: editingWorkoutId ? "#2196F3" : "#4CAF50", color: "white", border: "none", cursor: "pointer" }}>
+        <button
+          type="submit"
+          style={{
+            display: "block",
+            padding: "0.5rem 1rem",
+            borderRadius: "6px",
+            backgroundColor: editingWorkoutId ? "#2196F3" : "#4CAF50",
+            color: "white",
+            border: "none",
+            cursor: "pointer",
+          }}
+        >
           {editingWorkoutId ? "Update Workout" : "Add Workout"}
         </button>
       </form>
-
-      <div>
-        {workouts.map((w) => (
-          <div key={w.id} style={{ border: "1px solid #eee", padding: "1rem", borderRadius: "6px", marginBottom: "1rem" }}>
-            <h3>{w.name} - {w.date}</h3>
-            <ul style={{ listStyle: "none", padding: 0 }}>
-              {w.exercises.map((ex) => (
-                <li key={ex.id} style={{ padding: "0.25rem 0" }}>
-                  {ex.name}: {ex.sets} sets x {ex.reps} reps @ {ex.weight}kg {ex.setError ? "❌" : "✅"}
-                </li>
-              ))}
-            </ul>
-            <button onClick={() => loadWorkout(w)} style={{ padding: "0.3rem 0.6rem", borderRadius: "6px", backgroundColor: "#FFA500", color: "white", border: "none", cursor: "pointer" }}>
-              Edit
-            </button>
-          </div>
-        ))}
-      </div>
     </div>
   );
 }

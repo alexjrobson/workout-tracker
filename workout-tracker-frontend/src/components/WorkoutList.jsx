@@ -1,9 +1,26 @@
-import React, { useState } from "react";
-import { updateWorkout, deleteWorkout } from "../api/workouts";
+import React, { useState, useEffect, useContext } from "react";
+import { getWorkouts, updateWorkout, deleteWorkout } from "../api/workouts";
+import { AuthContext } from "../context/AuthContext";
 
-export default function WorkoutList({ workouts, setWorkouts }) {
+export default function WorkoutList() {
+  const { token } = useContext(AuthContext);  // get JWT from context
+  const [workouts, setWorkouts] = useState([]);
   const [editingId, setEditingId] = useState(null);
   const [editData, setEditData] = useState({ name: "", date: "" });
+
+  // Fetch workouts when component mounts OR token changes
+  useEffect(() => {
+    if (!token) return; // don’t fetch if not logged in
+    const fetchData = async () => {
+      try {
+        const data = await getWorkouts();
+        setWorkouts(data);
+      } catch (err) {
+        console.error("Failed to fetch workouts:", err);
+      }
+    };
+    fetchData();
+  }, [token]);
 
   const handleEditClick = (workout) => {
     setEditingId(workout.id);
@@ -82,7 +99,7 @@ export default function WorkoutList({ workouts, setWorkouts }) {
               </>
             )}
 
-            {/* keep your exercises table below */}
+            {/* exercises table */}
             {workout.exercises && workout.exercises.length > 0 ? (
               <table style={{ width: "100%", borderCollapse: "collapse", marginTop: "0.5rem" }}>
                 <thead>
@@ -115,6 +132,7 @@ export default function WorkoutList({ workouts, setWorkouts }) {
     </div>
   );
 }
+
 
 
 
