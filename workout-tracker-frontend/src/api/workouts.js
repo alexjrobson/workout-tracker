@@ -1,38 +1,36 @@
 const API_URL = "http://localhost:8080/api/workouts";
 
-// Helper: get auth headers
 function authHeader() {
   const token = localStorage.getItem("token");
   return token ? { Authorization: `Bearer ${token}` } : {};
 }
 
-/**
- * Fetch all workouts from backend
- * @returns Array of workouts or empty array on error
- */
-export const getWorkouts = async () => {
-  try {
-    const response = await fetch(API_URL, {
-      headers: { ...authHeader() },
-    });
-    if (!response.ok) throw new Error("Failed to fetch workouts");
-    return await response.json();
-  } catch (error) {
-    console.error("Error fetching workouts:", error);
-    return [];
+async function parse(response) {
+  if (!response.ok) {
+    const errMsg = await response.text();
+    throw new Error(errMsg || "Request failed");
   }
-};
+  if (response.status === 204) return true;
+  return response.json();
+}
 
-export async function updateWorkout(id, workout) {
-  const response = await fetch(`${API_URL}/${id}`, {
-    method: "PUT",
+export async function getWorkouts() {
+  const response = await fetch(API_URL, { headers: { ...authHeader() } });
+  return parse(response);
+}
+
+export async function getWorkout(id) {
+  const response = await fetch(`${API_URL}/${id}`, { headers: { ...authHeader() } });
+  return parse(response);
+}
+
+export async function saveWorkout(workout, id) {
+  const response = await fetch(id ? `${API_URL}/${id}` : API_URL, {
+    method: id ? "PUT" : "POST",
     headers: { "Content-Type": "application/json", ...authHeader() },
     body: JSON.stringify(workout),
   });
-  if (!response.ok) {
-    throw new Error("Failed to update workout");
-  }
-  return await response.json();
+  return parse(response);
 }
 
 export async function deleteWorkout(id) {
@@ -40,34 +38,5 @@ export async function deleteWorkout(id) {
     method: "DELETE",
     headers: { ...authHeader() },
   });
-  if (!response.ok) {
-    throw new Error("Failed to delete workout");
-  }
-  return true;
+  return parse(response);
 }
-
-/**
- * Add a new workout to backend
- * @param {Object} workout - { name: string, date: "YYYY-MM-DD", exercises: [{name,reps,sets}] }
- * @returns Newly created workout or null on error
- */
-export const addWorkout = async (workout) => {
-  try {
-    const response = await fetch(API_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", ...authHeader() },
-      body: JSON.stringify(workout),
-    });
-
-    if (!response.ok) {
-      const errMsg = await response.text();
-      throw new Error(`Failed to add workout: ${errMsg}`);
-    }
-
-    return await response.json();
-  } catch (error) {
-    console.error("Error adding workout:", error);
-    return null;
-  }
-};
-

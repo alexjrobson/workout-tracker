@@ -1,11 +1,10 @@
 package com.example.workout_tracker.model;
 
 import jakarta.persistence.*;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-
-//Represents a complete workout session, stores the date, name, and all the Exercise.java performed during the session
 
 @Entity
 public class Workout {
@@ -18,16 +17,24 @@ public class Workout {
 
     private LocalDate date;
 
-    @ManyToOne
+    @Enumerated(EnumType.STRING)
+    @Column(name = "workout_status", nullable = false)
+    private WorkoutStatus status = WorkoutStatus.PLANNED;
+
+    private Integer sessionRpe;
+
+    @Column(length = 2000)
+    private String notes;
+
+    @ManyToOne(optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    public User getUser() {
-        return user;
-    }
+    @OneToMany(mappedBy = "workout", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("sortOrder ASC")
+    private List<WorkoutExercise> exercises = new ArrayList<>();
 
-    public void setUser(User user) {
-        this.user = user;
+    public Workout() {
     }
 
     public Long getId() {
@@ -54,27 +61,48 @@ public class Workout {
         this.date = date;
     }
 
-    public Workout() {
-
+    public WorkoutStatus getStatus() {
+        return status;
     }
 
-    //One workout can contain multiple exercises.
-    @OneToMany(mappedBy ="workout", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Exercise> exercises = new ArrayList<>();
+    public void setStatus(WorkoutStatus status) {
+        this.status = status;
+    }
 
-    public List<Exercise> getExercises(){
+    public Integer getSessionRpe() {
+        return sessionRpe;
+    }
+
+    public void setSessionRpe(Integer sessionRpe) {
+        this.sessionRpe = sessionRpe;
+    }
+
+    public String getNotes() {
+        return notes;
+    }
+
+    public void setNotes(String notes) {
+        this.notes = notes;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public List<WorkoutExercise> getExercises() {
         return exercises;
     }
-    public void setExercises(List<Exercise> exercises){ this.exercises = exercises;}
 
-    public void addExercise (Exercise exercise){
+    public void setExercises(List<WorkoutExercise> exercises) {
+        this.exercises = exercises;
+    }
+
+    public void addExercise(WorkoutExercise exercise) {
         exercises.add(exercise);
         exercise.setWorkout(this);
     }
-
-    public void removeExercise(Exercise exercise){
-        exercises.remove(exercise);
-        exercise.setWorkout(null);
-    }
-
 }

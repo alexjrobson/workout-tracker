@@ -1,33 +1,35 @@
-import React, { useState, useEffect } from "react";
-import WorkoutForm from "./components/WorkoutForm";
-import WorkoutList from "./components/WorkoutList";
+import { Navigate, Route, Routes } from "react-router-dom";
+import { useAuth } from "./context/AuthContext";
+import ProtectedRoute from "./components/ProtectedRoute";
+import Layout from "./components/Layout";
 import LoginForm from "./components/LoginForm";
-import { getWorkouts } from "./api/workouts";
+import HomePage from "./components/HomePage";
+import PlanPage from "./components/PlanPage";
+import SessionPage from "./components/SessionPage";
+import HistoryPage from "./components/HistoryPage";
+import ProgressPage from "./components/ProgressPage";
 
 function App() {
-  const [workouts, setWorkouts] = useState([]);
-  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("token"));
-
-  useEffect(() => {
-    if (isLoggedIn) {
-      const fetchWorkouts = async () => {
-        const data = await getWorkouts();
-        setWorkouts(data);
-      };
-      fetchWorkouts();
-    }
-  }, [isLoggedIn]);
-
-  if (!isLoggedIn) {
-    return <LoginForm onLogin={() => setIsLoggedIn(true)} />;
-  }
+  const { token } = useAuth();
 
   return (
-    <div style={{ fontFamily: "sans-serif", maxWidth: "600px", margin: "auto", padding: "2rem" }}>
-      <h1 style={{ textAlign: "center", marginBottom: "2rem" }}>Workout Tracker</h1>
-      <WorkoutForm workouts={workouts} setWorkouts={setWorkouts} />
-      <WorkoutList workouts={workouts} />
-    </div>
+    <Routes>
+      <Route path="/login" element={token ? <Navigate to="/" replace /> : <LoginForm />} />
+      <Route
+        element={
+          <ProtectedRoute>
+            <Layout />
+          </ProtectedRoute>
+        }
+      >
+        <Route path="/" element={<HomePage />} />
+        <Route path="/plan" element={<PlanPage />} />
+        <Route path="/session/:id" element={<SessionPage />} />
+        <Route path="/history" element={<HistoryPage />} />
+        <Route path="/progress" element={<ProgressPage />} />
+      </Route>
+      <Route path="*" element={<Navigate to={token ? "/" : "/login"} replace />} />
+    </Routes>
   );
 }
 

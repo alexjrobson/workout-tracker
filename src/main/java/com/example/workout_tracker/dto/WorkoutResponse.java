@@ -1,54 +1,74 @@
 package com.example.workout_tracker.dto;
 
+import com.example.workout_tracker.model.WorkoutStatus;
+
 import java.time.LocalDate;
 import java.util.List;
-
-//DTO for sending workout data to the frontend. Contains nested exercises.
 
 public class WorkoutResponse {
     private Long id;
     private String name;
     private LocalDate date;
-    private List<ExerciseResponse> exercises;
+    private WorkoutStatus status;
+    private Integer sessionRpe;
+    private String notes;
+    private int failedSets;
+    private int totalSets;
+    private double volume;
+    private List<WorkoutExerciseResponse> exercises;
 
-
-    public WorkoutResponse(Long id, String name, LocalDate date, List<ExerciseResponse> exercises){
+    public WorkoutResponse(Long id, String name, LocalDate date, WorkoutStatus status,
+                           Integer sessionRpe, String notes, int failedSets, int totalSets,
+                           double volume, List<WorkoutExerciseResponse> exercises) {
         this.id = id;
         this.name = name;
         this.date = date;
+        this.status = status;
+        this.sessionRpe = sessionRpe;
+        this.notes = notes;
+        this.failedSets = failedSets;
+        this.totalSets = totalSets;
+        this.volume = volume;
         this.exercises = exercises;
-
     }
 
     public Long getId() {
         return id;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public String getName() {
         return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public LocalDate getDate() {
         return date;
     }
 
-    public void setDate(LocalDate date) {
-        this.date = date;
+    public WorkoutStatus getStatus() {
+        return status;
     }
 
-    public List<ExerciseResponse> getExercises() {
+    public Integer getSessionRpe() {
+        return sessionRpe;
+    }
+
+    public String getNotes() {
+        return notes;
+    }
+
+    public int getFailedSets() {
+        return failedSets;
+    }
+
+    public int getTotalSets() {
+        return totalSets;
+    }
+
+    public double getVolume() {
+        return volume;
+    }
+
+    public List<WorkoutExerciseResponse> getExercises() {
         return exercises;
-    }
-
-    public void setExercises(List<ExerciseResponse> exercises) {
-        this.exercises = exercises;
     }
 }

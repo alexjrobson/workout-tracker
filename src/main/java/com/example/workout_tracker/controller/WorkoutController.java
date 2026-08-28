@@ -1,128 +1,82 @@
 package com.example.workout_tracker.controller;
 
-import com.example.workout_tracker.dto.ExerciseRequest;
-import com.example.workout_tracker.dto.ExerciseResponse;
 import com.example.workout_tracker.dto.WorkoutRequest;
 import com.example.workout_tracker.dto.WorkoutResponse;
+import com.example.workout_tracker.model.User;
 import com.example.workout_tracker.model.Workout;
 import com.example.workout_tracker.repository.WorkoutRepository;
-import com.example.workout_tracker.model.Exercise;
+import com.example.workout_tracker.service.CurrentUserService;
+import com.example.workout_tracker.service.WorkoutMapper;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static java.util.Arrays.stream;
-
-//REST controller for managin workouts. Handles CRUD operations for workouts and delegates nested exercises to the ExerciseController or service layer.
-
-@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/api/workouts")
+@Transactional
 public class WorkoutController {
 
-    @Autowired
-    private WorkoutRepository workoutRepository;
+    private final WorkoutRepository workoutRepository;
+    private final CurrentUserService currentUserService;
+    private final WorkoutMapper workoutMapper;
+
+    public WorkoutController(WorkoutRepository workoutRepository,
+                             CurrentUserService currentUserService,
+                             WorkoutMapper workoutMapper) {
+        this.workoutRepository = workoutRepository;
+        this.currentUserService = currentUserService;
+        this.workoutMapper = workoutMapper;
+    }
 
     @GetMapping
-    public List<WorkoutResponse> getAllWorkouts(){
-        return workoutRepository.findAll()
-                .stream()
-                .map(this::mapWorkoutToResponse)
+    public List<WorkoutResponse> getAllWorkouts() {
+        User user = currentUserService.requireUser();
+        return workoutRepository.findByUserOrderByDateDescIdDesc(user).stream()
+                .map(workoutMapper::toResponse)
                 .collect(Collectors.toList());
     }
 
-
     @GetMapping("/{id}")
-    public ResponseEntity<WorkoutResponse> getWorkoutById(@PathVariable Long id){
-        Workout workout = workoutRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Workout not found"));
-        return ResponseEntity.ok(mapWorkoutToResponse(workout));
+    public ResponseEntity<WorkoutResponse> getWorkoutById(@PathVariable Long id) {
+        return ResponseEntity.ok(workoutMapper.toResponse(ownedWorkout(id)));
     }
+
     @PostMapping
-    public ResponseEntity<WorkoutResponse> createWorkout(@Valid @RequestBody WorkoutRequest request){
+    public ResponseEntity<WorkoutResponse> createWorkout(@Valid @RequestBody WorkoutRequest request) {
+        User user = currentUserService.requireUser();
         Workout workout = new Workout();
-        workout.setName(request.getName());
-        workout.setDate(request.getDate());
-
-        if (request.getExercises() != null) {
-            List<Exercise> exercises = request.getExercises().stream()
-                    .map(exReq -> {
-                        Exercise ex = new Exercise();
-                        ex.setName(exReq.getName());
-                        ex.setReps(exReq.getReps());
-                        ex.setSets(exReq.getSets());
-                        ex.setWeight(exReq.getWeight());
-                        ex.setSetError(exReq.isSetError());
-                        ex.setWorkout(workout); // set the link back
-                        return ex;
-                    })
-                    .collect(Collectors.toList());
-            workout.setExercises(exercises);
-        }
-
+        workout.setUser(user);
+        workoutMapper.applyRequest(workout, request);
         Workout saved = workoutRepository.save(workout);
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(mapWorkoutToResponse(saved));
+        return ResponseEntity.status(HttpStatus.CREATED).body(workoutMapper.toResponse(saved));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<WorkoutResponse> updateWorkout(
             @PathVariable Long id,
             @Valid @RequestBody WorkoutRequest request) {
-
-        Workout workout = workoutRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Workout not found"));
-
-        // Update fields if provided
-        if (request.getName() != null) workout.setName(request.getName());
-        if (request.getDate() != null) workout.setDate(request.getDate());
-
-        // Clear & rebuild exercises (orphanRemoval=true will delete removed ones)
-        workout.getExercises().clear();
-        if (request.getExercises() != null) {
-            for (ExerciseRequest exReq : request.getExercises()) {
-                Exercise ex = new Exercise(
-                        exReq.getName(),
-                        exReq.getReps(),
-                        exReq.getSets(),
-                        exReq.getWeight(),
-                        exReq.isSetError(),
-                        workout
-                );
-                workout.addExercise(ex); // keeps both sides in sync
-            }
-        }
-
+        Workout workout = ownedWorkout(id);
+        workoutMapper.applyRequest(workout, request);
         Workout saved = workoutRepository.save(workout);
-        return ResponseEntity.ok(mapWorkoutToResponse(saved));
+        return ResponseEntity.ok(workoutMapper.toResponse(saved));
     }
-
-
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteWorkout(@PathVariable Long id) {
-        if (!workoutRepository.existsById(id)) {
-            return ResponseEntity.notFound().build();
-        }
-        workoutRepository.deleteById(id);
+        Workout workout = ownedWorkout(id);
+        workoutRepository.delete(workout);
         return ResponseEntity.noContent().build();
     }
 
-    public WorkoutResponse mapWorkoutToResponse(Workout workout){
-        List<Exercise> exercises = workout.getExercises() == null ? Collections.emptyList() : workout.getExercises();
-
-        List<ExerciseResponse> exerciseResponses = exercises.stream()
-                .map(ex -> new ExerciseResponse(ex.getId(), ex.getName(), ex.getReps(), ex.getSets(),ex.getWeight(), ex.isSetError()))
-                .collect(Collectors.toList());
-
-        return new WorkoutResponse(workout.getId(), workout.getName(),workout.getDate(), exerciseResponses);
+    private Workout ownedWorkout(Long id) {
+        User user = currentUserService.requireUser();
+        return workoutRepository.findByIdAndUser(id, user)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Workout not found"));
     }
 }
