@@ -177,13 +177,6 @@ h1 {
   font-weight: 500;
 }
 
-.metric-hint {
-  margin: 0.45rem 0 0;
-  color: var(--muted);
-  font-size: 0.72rem;
-  line-height: 1.35;
-}
-
 .card {
   background: var(--bg-elev);
   border: 1px solid var(--line-soft);

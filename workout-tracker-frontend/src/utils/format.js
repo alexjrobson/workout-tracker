@@ -11,11 +11,11 @@ export function formatTarget(sets, reps, weight) {
 }
 
 export function rpeDescription(value) {
-  if (value <= 3) return "Easy — plenty left in the tank";
-  if (value <= 5) return "Moderate — could do several more reps";
-  if (value <= 7) return "Hard — 3 reps or fewer left";
-  if (value <= 9) return "Very hard — 1–2 reps left";
-  return "Max effort — nothing left";
+  if (value <= 3) return "Easy, plenty left in the tank";
+  if (value <= 5) return "Moderate, a few more reps in you";
+  if (value <= 7) return "Hard, maybe 3 reps left";
+  if (value <= 9) return "Very hard, 1 or 2 reps left";
+  return "Max effort, nothing left";
 }
 
 export function trendLabel(vsPrevious) {
