@@ -1,0 +1,23 @@
+{
+  "name": "Iron Log (workout-tracker)",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "user": "ubuntu",
+  "install": "bash ./.cursor/install.sh",
+  "start": "bash ./.cursor/start.sh",
+  "terminals": [
+    {
+      "name": "backend",
+      "command": "java --enable-preview -jar target/workout-tracker-0.0.1-SNAPSHOT.jar"
+    },
+    {
+      "name": "frontend",
+      "command": "cd workout-tracker-frontend && BROWSER=none PORT=3000 npm start"
+    }
+  ],
+  "ports": [
+    { "name": "frontend", "port": 3000 },
+    { "name": "backend", "port": 8080 }
+  ]
+}

@@ -6,7 +6,6 @@ export default function MetricCard({ label, value, unit, hint }) {
         <strong className="metric-value">{value}</strong>
         {unit && <span className="metric-unit">{unit}</span>}
       </div>
-      {hint && <p className="metric-hint">{hint}</p>}
     </div>
   );
 }

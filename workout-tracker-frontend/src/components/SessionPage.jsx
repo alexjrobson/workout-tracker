@@ -124,7 +124,7 @@ export default function SessionPage() {
 
       <SectionCard
         title="How did it feel?"
-        subtitle="Session RPE — rate overall difficulty from 1 (easy) to 10 (max effort)."
+        subtitle="Rate the whole session from 1 (easy) to 10 (max effort)."
       >
         <div className="rpe-block">
           <div className="rpe-display">
@@ -169,7 +169,7 @@ export default function SessionPage() {
         </button>
       </div>
       <p className="muted" style={{ marginTop: "0.75rem", fontSize: "0.78rem" }}>
-        Save & exit keeps this as planned. Finish session marks it complete and unlocks progress tracking.
+        Save &amp; exit keeps it planned. Finish marks it complete so it counts toward progress.
       </p>
     </div>
   );
