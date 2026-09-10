@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { searchCatalog } from "../api/catalog";
 import { saveWorkout } from "../api/workouts";
 import PageHeader from "./ui/PageHeader";
@@ -19,12 +19,26 @@ function emptySets(count, reps, weight) {
 
 export default function PlanPage() {
   const navigate = useNavigate();
-  const [name, setName] = useState("Training day");
-  const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
+  const location = useLocation();
+  const prefill = location.state?.prefill;
+  const [name, setName] = useState(prefill?.name || "Training day");
+  const [date, setDate] = useState(
+    prefill?.date || new Date().toISOString().split("T")[0]
+  );
   const [query, setQuery] = useState("");
   const [muscle, setMuscle] = useState("");
   const [catalog, setCatalog] = useState([]);
-  const [exercises, setExercises] = useState([]);
+  const [exercises, setExercises] = useState(() =>
+    (prefill?.exercises || []).map((ex) => ({
+      catalogId: ex.catalogId ?? null,
+      name: ex.name,
+      muscleGroup: ex.muscleGroup,
+      targetSets: ex.targetSets ?? 3,
+      targetReps: ex.targetReps ?? 8,
+      targetWeight: ex.targetWeight ?? 0,
+      sets: emptySets(ex.targetSets ?? 3, ex.targetReps ?? 8, ex.targetWeight ?? 0),
+    }))
+  );
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -161,6 +175,7 @@ export default function PlanPage() {
                     type="number"
                     min="1"
                     value={ex.targetSets}
+                    onFocus={(e) => e.target.select()}
                     onChange={(e) => updateExercise(i, "targetSets", e.target.value)}
                   />
                 </LabeledField>
@@ -171,6 +186,7 @@ export default function PlanPage() {
                     type="number"
                     min="1"
                     value={ex.targetReps}
+                    onFocus={(e) => e.target.select()}
                     onChange={(e) => updateExercise(i, "targetReps", e.target.value)}
                   />
                 </LabeledField>
@@ -181,6 +197,7 @@ export default function PlanPage() {
                     type="number"
                     min="0"
                     value={ex.targetWeight}
+                    onFocus={(e) => e.target.select()}
                     onChange={(e) => updateExercise(i, "targetWeight", e.target.value)}
                   />
                 </LabeledField>

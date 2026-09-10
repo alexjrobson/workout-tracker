@@ -6,6 +6,17 @@ export function useAuth() {
   return useContext(AuthContext);
 }
 
+export function usernameFromToken(token) {
+  if (!token) return null;
+  try {
+    const payload = token.split(".")[1];
+    const json = JSON.parse(atob(payload.replace(/-/g, "+").replace(/_/g, "/")));
+    return json.sub || null;
+  } catch {
+    return null;
+  }
+}
+
 export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(localStorage.getItem("token") || null);
 
@@ -20,7 +31,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ token, login, logout }}>
+    <AuthContext.Provider value={{ token, username: usernameFromToken(token), login, logout }}>
       {children}
     </AuthContext.Provider>
   );
