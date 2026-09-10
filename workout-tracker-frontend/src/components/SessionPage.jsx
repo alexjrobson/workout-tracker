@@ -97,6 +97,7 @@ export default function SessionPage() {
                   type="number"
                   inputMode="decimal"
                   value={set.weight ?? ""}
+                  onFocus={(e) => e.target.select()}
                   onChange={(e) => updateSet(exIndex, setIndex, "weight", e.target.value)}
                   aria-label={`Set ${setIndex + 1} weight`}
                 />
@@ -105,6 +106,7 @@ export default function SessionPage() {
                   type="number"
                   inputMode="numeric"
                   value={set.reps ?? ""}
+                  onFocus={(e) => e.target.select()}
                   onChange={(e) => updateSet(exIndex, setIndex, "reps", e.target.value)}
                   aria-label={`Set ${setIndex + 1} reps`}
                 />
