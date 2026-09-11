@@ -1,0 +1,11 @@
+.git
+.gitattributes
+.gitignore
+.cursor/
+target/
+**/target/
+workout-tracker-frontend/node_modules/
+workout-tracker-frontend/build/
+*.md
+.idea/
+*.iml
