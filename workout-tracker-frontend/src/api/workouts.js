@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:8080/api/workouts";
+const API_URL = "/api/workouts";
 
 function authHeader() {
   const token = localStorage.getItem("token");
