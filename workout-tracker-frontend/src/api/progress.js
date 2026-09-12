@@ -4,10 +4,9 @@ function authHeader() {
 }
 
 export async function getProgress(catalogId) {
-  const response = await fetch(
-    `http://localhost:8080/api/progress?catalogId=${catalogId}`,
-    { headers: { ...authHeader() } }
-  );
+  const response = await fetch(`/api/progress?catalogId=${catalogId}`, {
+    headers: { ...authHeader() },
+  });
   if (!response.ok) throw new Error("Failed to load progress");
   return response.json();
 }

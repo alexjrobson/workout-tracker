@@ -31,7 +31,19 @@ A full-stack workout tracker for planning sessions, logging sets, rating effort 
 
 ---
 
-## Quick start
+## Run the whole app (Docker)
+
+The fastest way to start everything — API, web UI, and PostgreSQL — is Docker Compose:
+
+```bash
+docker compose up --build
+```
+
+Then open **http://localhost:8080**. The React app is built and served by the API from a single origin, so there's no separate frontend server or manual database setup. Data persists in the `pgdata` volume. Stop with `docker compose down` (add `-v` to also wipe the database).
+
+---
+
+## Quick start (local dev)
 
 ### 1. Database
 
